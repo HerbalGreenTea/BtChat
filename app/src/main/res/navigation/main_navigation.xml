@@ -12,11 +12,20 @@
         tools:layout="@layout/fragment_chat" >
         <action
             android:id="@+id/action_chatFragment_to_connectDevFragment"
-            app:destination="@id/connectDevFragment" />
+            app:destination="@id/pairedDevFragment" />
     </fragment>
     <fragment
-        android:id="@+id/connectDevFragment"
-        android:name="com.example.btchat.ConnectDevFragment"
+        android:id="@+id/pairedDevFragment"
+        android:name="com.example.btchat.PairedDevFragment"
         android:label="fragment_connect_dev"
-        tools:layout="@layout/fragment_connect_dev" />
+        tools:layout="@layout/fragment_paired_dev" >
+        <action
+            android:id="@+id/action_connectDevFragment_to_discoveryDevsFragment"
+            app:destination="@id/discoveryDevsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/discoveryDevsFragment"
+        android:name="com.example.btchat.DiscoveryDevsFragment"
+        android:label="fragment_discovery_devs"
+        tools:layout="@layout/fragment_discovery_devs" />
 </navigation>
