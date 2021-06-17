@@ -1,11 +1,17 @@
 package com.example.btchat
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.example.btchat.adapters.PairDevListAdapter
 import kotlinx.android.synthetic.main.fragment_paired_dev.view.*
@@ -14,9 +20,11 @@ class PairedDevFragment : Fragment() {
 
     private val btAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+    private val permissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) findNavController().navigate(R.id.discoveryDevsFragment)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_paired_dev, container, false)
     }
@@ -36,7 +44,7 @@ class PairedDevFragment : Fragment() {
         }
 
         view.btn_open_fragment_discovery_dev.setOnClickListener {
-            findNavController().navigate(R.id.discoveryDevsFragment)
+            permissionResult.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
