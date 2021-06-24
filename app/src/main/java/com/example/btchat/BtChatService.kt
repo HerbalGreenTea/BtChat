@@ -7,24 +7,23 @@ import android.bluetooth.BluetoothSocket
 import android.util.Log
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
-class BtDataService {
+class BtChatService {
     companion object {
-        private val MY_UUID_INSECURE =
-                UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66")
-
+        private val MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66")
         private const val APP_NAME = "BtChat"
     }
 
     var connectionState: ConnectionState = ConnectionState.STATE_NONE
+
     private val btAdapter = BluetoothAdapter.getDefaultAdapter()
 
     private var bluetoothServerSocket: BluetoothServerSocket? = null
-
     private var inputStream: InputStream? = null
     private var outputStream: OutputStream? = null
 
@@ -41,11 +40,10 @@ class BtDataService {
                         connected(btSocket)
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(Schedulers.io())
-                                .subscribe() {
+                                .subscribe {
                                     acceptSubscribe.onNext(it)
                                 }
-//                    ConnectionState.STATE_NONE, ConnectionState.STATE_CONNECTED -> btSocket.close()
-                    else -> {}
+                    ConnectionState.STATE_NONE, ConnectionState.STATE_CONNECTED -> btSocket.close()
                 }
             }
         }
@@ -63,7 +61,10 @@ class BtDataService {
         while (connectionState == ConnectionState.STATE_CONNECTED) {
             try {
                 bytes = inputStream?.read(buffer)
-                it.onNext(bytes.toString())
+                if (bytes != null) {
+                    val message = String(buffer, 0, bytes)
+                    it.onNext(message)
+                }
             } catch (e: Exception) {
                 connectionState = ConnectionState.STATE_NONE
                 break
@@ -91,4 +92,10 @@ class BtDataService {
     }, BackpressureStrategy.DROP)
 
     // дописать канселы
+
+    fun stop() {
+        bluetoothServerSocket?.close()
+        inputStream?.close()
+        outputStream?.close()
+    }
 }

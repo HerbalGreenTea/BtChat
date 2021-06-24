@@ -1,21 +1,17 @@
-package com.example.btchat
+package com.example.btchat.fragments
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.btchat.OnItemBtDevClickListener
+import com.example.btchat.R
 import com.example.btchat.adapters.PairDevListAdapter
 import com.example.btchat.viewModels.SharedViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

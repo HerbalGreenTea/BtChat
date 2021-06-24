@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.btchat.ChatFragment"
+        android:name="com.example.btchat.fragments.ChatFragment"
         android:label="fragment_chat"
         tools:layout="@layout/fragment_chat" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/pairedDevFragment"
-        android:name="com.example.btchat.PairedDevFragment"
+        android:name="com.example.btchat.fragments.PairedDevFragment"
         android:label="fragment_connect_dev"
         tools:layout="@layout/fragment_paired_dev" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/discoveryDevsFragment"
-        android:name="com.example.btchat.DiscoveryDevsFragment"
+        android:name="com.example.btchat.fragments.DiscoveryDevsFragment"
         android:label="fragment_discovery_devs"
         tools:layout="@layout/fragment_discovery_devs" />
 </navigation>

@@ -1,14 +1,16 @@
-package com.example.btchat
+package com.example.btchat.fragments
 
 import android.os.Bundle
-import android.os.Message
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.btchat.BtChatService
+import com.example.btchat.ConnectionState
+import com.example.btchat.R
+import com.example.btchat.adapters.MessageListAdapter
 import com.example.btchat.viewModels.SharedViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -16,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_chat.view.*
 
 class ChatFragment : Fragment() {
     companion object {
-        val btDataService: BtDataService = BtDataService()
+        val btDataService: BtChatService = BtChatService()
     }
 
     private lateinit var sharedViewModel: SharedViewModel
@@ -40,10 +42,13 @@ class ChatFragment : Fragment() {
         view.btn_send_message.setOnClickListener {
             val text = view.typing_message.text.toString()
             sendMessage(text)
+            view.typing_message.setText("")
         }
 
-        sharedViewModel.newMessageLiveData.observe(viewLifecycleOwner) {
-            view.typing_message.setText(it)
+        view.rv_list_message.adapter = MessageListAdapter().apply {
+            sharedViewModel.newMessageLiveData.observe(viewLifecycleOwner) {
+                addMessage(it)
+            }
         }
     }
 
@@ -54,14 +59,14 @@ class ChatFragment : Fragment() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                        view?.typing_message?.setText(it.toString())
+                        sharedViewModel.setNewMessage(it)
                     }
         }
     }
 
-    fun sendMessage(text: String) {
+    private fun sendMessage(text: String) {
         val bytes = text.toByteArray()
         btDataService.write(bytes)
+        sharedViewModel.setNewMessage(text)
     }
 }

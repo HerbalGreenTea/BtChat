@@ -1,4 +1,4 @@
-package com.example.btchat
+package com.example.btchat.fragments
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.btchat.OnItemBtDevClickListener
+import com.example.btchat.R
 import com.example.btchat.adapters.PairDevListAdapter
 import kotlinx.android.synthetic.main.fragment_discovery_devs.view.*
 
@@ -20,7 +22,7 @@ class DiscoveryDevsFragment : Fragment() {
 
     private val pairDevListAdapter: PairDevListAdapter = PairDevListAdapter(listOf()).apply {
 
-        setOnItemBtDevClickListener(object : OnItemBtDevClickListener{
+        setOnItemBtDevClickListener(object : OnItemBtDevClickListener {
             override fun onDevClick(devAddress: String) {
                 val dev = btAdapter.getRemoteDevice(devAddress)
                 dev.createBond()
