@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.btchat.BtChatService
-import com.example.btchat.ConnectionState
-import com.example.btchat.R
+import com.example.btchat.*
 import com.example.btchat.adapters.MessageListAdapter
 import com.example.btchat.viewModels.SharedViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -41,13 +39,20 @@ class ChatFragment : Fragment() {
 
         view.btn_send_message.setOnClickListener {
             val text = view.typing_message.text.toString()
-            sendMessage(text)
-            view.typing_message.setText("")
+            if (text.isNotEmpty()) {
+                sendMessage(text)
+                view.typing_message.setText("")
+            }
         }
 
         view.rv_list_message.adapter = MessageListAdapter().apply {
-            sharedViewModel.newMessageLiveData.observe(viewLifecycleOwner) {
-                addMessage(it)
+            sharedViewModel.newMessageLiveData.observe(viewLifecycleOwner) { btMessage ->
+
+                when(btMessage.typeMessage) {
+                    TypeMessage.CONNECTING_MESSAGE, TypeMessage.CONNECTED_MESSAGE ->
+                        setStatusConnect(btMessage.textMessage)
+                    TypeMessage.USER_MESSAGE -> addMessage(btMessage.textMessage)
+                }
             }
         }
     }
@@ -64,9 +69,18 @@ class ChatFragment : Fragment() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // TODO отписки
+    }
+
     private fun sendMessage(text: String) {
         val bytes = text.toByteArray()
         btDataService.write(bytes)
-        sharedViewModel.setNewMessage(text)
+        sharedViewModel.setNewMessage(BtMessage(text, TypeMessage.USER_MESSAGE))
+    }
+
+    private fun setStatusConnect(status: String) {
+        (requireActivity() as MainActivity).fieldStatus.text = status
     }
 }

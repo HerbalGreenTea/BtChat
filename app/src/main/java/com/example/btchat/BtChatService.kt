@@ -27,7 +27,7 @@ class BtChatService {
     private var inputStream: InputStream? = null
     private var outputStream: OutputStream? = null
 
-    fun startBtAccept(): Flowable<String> = Flowable.create({ acceptSubscribe ->
+    fun startBtAccept(): Flowable<BtMessage> = Flowable.create({ acceptSubscribe ->
         bluetoothServerSocket = btAdapter.listenUsingInsecureRfcommWithServiceRecord(APP_NAME, MY_UUID_INSECURE)
         connectionState = ConnectionState.STATE_LISTEN
 
@@ -50,10 +50,11 @@ class BtChatService {
 
     }, BackpressureStrategy.DROP)
 
-    private fun connected(btSocket: BluetoothSocket): Flowable<String> = Flowable.create({
+    private fun connected(btSocket: BluetoothSocket): Flowable<BtMessage> = Flowable.create({
         inputStream = btSocket.inputStream
         outputStream = btSocket.outputStream
         connectionState = ConnectionState.STATE_CONNECTED
+        it.onNext(BtMessage(btSocket.remoteDevice.name, TypeMessage.CONNECTED_MESSAGE))
 
         val buffer = ByteArray(1024)
         var bytes: Int? = null
@@ -63,7 +64,7 @@ class BtChatService {
                 bytes = inputStream?.read(buffer)
                 if (bytes != null) {
                     val message = String(buffer, 0, bytes)
-                    it.onNext(message)
+                    it.onNext(BtMessage(message, TypeMessage.USER_MESSAGE))
                 }
             } catch (e: Exception) {
                 connectionState = ConnectionState.STATE_NONE
@@ -75,9 +76,11 @@ class BtChatService {
 
     fun write(bytes: ByteArray) = outputStream?.write(bytes)
 
-    fun startBtConnect(dev: BluetoothDevice): Flowable<String> = Flowable.create({ connectSubscribe ->
+    fun startBtConnect(dev: BluetoothDevice): Flowable<BtMessage> = Flowable.create({ connectSubscribe ->
         val btSocket: BluetoothSocket? = dev.createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE)
         connectionState = ConnectionState.STATE_CONNECTING
+        connectSubscribe.onNext(BtMessage("подключение", TypeMessage.CONNECTING_MESSAGE))
+
         btAdapter.cancelDiscovery()
         btSocket?.connect()
 
